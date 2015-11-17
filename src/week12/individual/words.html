@@ -39,7 +39,7 @@
     <div class="parallax">
       <img src="http://res.cloudinary.com/craftml/image/upload/c_scale,e_brightness:-62,w_1000/v1447038536/books_nh4k05.jpg">
       <h1 id="title">How did word usage change over time?
-        <div class="authors">by Name</div>
+        <div class="authors">by Kevin K. Gifford</div>
       </h1>
     </div>
   </div>
@@ -65,7 +65,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
   <script>
-
 function toggleSourecode(){
   $('pre').each(function(){
     if ($(this).height()){
@@ -77,7 +76,6 @@ function toggleSourecode(){
   })
 }
 $('.switch input').click(toggleSourecode)
-
 function csv2jsonArray(rawdata){
   console.log('converting csv to json array')
   var lines = rawdata.trim().split('\n')
@@ -89,36 +87,28 @@ function csv2jsonArray(rawdata){
     // return {decade:1900, word: 'the', count: 721149566}
   })
 }
-
 var items
 $.ajax({url: 'https://big-data-hci-hackathon.firebaseapp.com/data/100yr_ngrams_10000.csv'})
  .done(function(rawdata){
-
   items = csv2jsonArray(rawdata)
   console.log('number of items loaded:', items.length)
   console.log('first item:', items[0])
-
   analyze()
-
  })
  .fail(function(err){
      console.error(err)
  })
-
 function ask(text, func){
   var answer = func(items)
-
   // html element to display the answer
   var answerHtml = '<div class="collection-item answer">' +
       '<h4>' + text + '</h4>' +
       '<div>' + answer + '</div>' +
       '<pre><code>' + func.toString() + '</code></pre>' +
     '</div>'
-
   // append to #quetions
   $('#questions').append(answerHtml)
 }
-
 function analyze(){
   ask('how many decades in the dataset?', example)
   ask('how does the word DATA change in popularity over the decades?', func1)
@@ -130,68 +120,215 @@ function analyze(){
   ask('in the decade when the word Internet became popular for the first time, what other words also became popular for the first time?', func7)
   ask('when did the word OIL become more popular than GOLD?', func8)
   ask('what terms saw the biggest drop in popularity over the past century?', func9)
-
   // HINT: This is a hard question.
   // One possible algorithm is to first encode the changes as a binary string
   // For example, war => 100111001, where 1 means UP, 0 means down.
   // Then identify those with the exact encoding.
   ask('what terms are most similar to the term WAR in terms of the changes in popularity?', func10)
-
   $('pre code').each(function(i, block) {
     hljs.highlightBlock(block);
   })
   toggleSourecode()
 }
-
-function example(){
+function example() {
+  var decades = _.unique(_.pluck(items, 'decade'))
   return _.unique(_.pluck(items, 'decade')).length
 }
-
-function func1(){
+function func1() {
+  var datafilter = _.filter(items, function(d) {
+    return d.word == 'data'
+  })
+  var groups = _.groupBy(datafilter, 'decade')
+  var rank =  _.mapValues(groups, function(d) {
+    return _.flatten(_.pluck(d, 'rank'))
+  })
+  return _.pairs(rank).join(' | ')
+}
+function func2() {
+  var datafilter = _.filter(items, function(d) {
+    return d.word == 'oil'
+  })
+  var groups = _.groupBy(datafilter, 'decade')
+  var results =  _.mapValues(groups, function(d) {
+    return _.flatten(_.pluck(d, 'rank'))
+  })
+  var sorted_output = _.sortBy(_.pairs(results), function(d) {
+    return -d[1]
+  })
+  return sorted_output[0][0] + "'s"
+}
+function func3() {
+  var datafilter = _.filter(items, function(d) {
+    return d.word == 'feminism' || d.word == 'Feminism' || d.word == 'Feminism'
+  })
+  var groups = _.groupBy(datafilter, 'decade')
+  var results =  _.mapValues(groups, function(d) {
+    return _.flatten(_.pluck(d, 'rank'))
+  })
+  var sorted_output = _.sortBy(_.pairs(results), function(d) {
+    return -d[1]
+  })
+  return sorted_output[0][0] + "'s"
+}
+function func4() {
+  var datafilter = _.filter(items, function(d) {
+    return d.word == 'communism' || d.word == 'Communism' || d.word == 'COMMUNISM'
+  })
+  var groups = _.groupBy(datafilter, 'decade')
+  var rank =  _.mapValues(groups, function(d) {
+    return _.flatten(_.pluck(d, 'rank'))
+  })
+  return _.pairs(rank).join(' | ')
+}
+function linearRegression(y, x) {
+  var lr = {};
+  var n = y.length;
+  var sum_x = 0;
+  var sum_y = 0;
+  var sum_xy = 0;
+  var sum_xx = 0;
+  var sum_yy = 0;
+  for (var i = 0; i < y.length; i++) {
+    sum_x += x[i];
+    sum_y += y[i];
+    sum_xy += (x[i]*y[i]);
+    sum_xx += (x[i]*x[i]);
+    sum_yy += (y[i]*y[i]);
+  } 
+  lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n*sum_xx - sum_x * sum_x);
+  lr['intercept'] = (sum_y - lr.slope * sum_x)/n;
+  lr['r2'] = Math.pow((n*sum_xy - sum_x*sum_y)/Math.sqrt((n*sum_xx-sum_x*sum_x)*(n*sum_yy-sum_y*sum_y)),2);
+  return lr;
+}
+function func5() {
+  var x
+  var y
+  var lr
+  var string = 'In-fashion in early decades ==> greatest positive slope: ' 
+  var groups = _.groupBy(items, 'word')
+  var results = _.map(groups, function(key, value) {
+    y = _.map(key, function(d) {
+      return parseInt(d.rank)
+    })
+    x = _.map(key, function(d) {
+      return parseInt(d.decade)
+    })
+    lr = linearRegression(y, x)
+    return { word: value, slope: lr.slope }
+  })
+  var filtered_results = _.filter(results, function(d) {
+    return !(_.isNaN(d.slope))
+  })
+  var sorted_results = _.sortBy(filtered_results, function(d) {
+    return -d.slope
+  })
+  var words = _.map(sorted_results, function(d) {
+    return '\n' + d.word
+  })
+  return string + _.take(words, 100)
+}
+function func6() {
+  var x
+  var y
+  var lr
+  var string = 'In-fashion in recent decades ==> greatest negative slope: ' 
+  var groups = _.groupBy(items, 'word')
+  var results = _.map(groups, function(key, value) {
+    y = _.map(key, function(d) {
+      return parseInt(d.rank)
+    })
+    x = _.map(key, function(d) {
+      return parseInt(d.decade)
+    })
+    lr = linearRegression(y, x)
+    return { word: value, slope: lr.slope }
+  })
+  var filtered_results = _.filter(results, function(d) {
+    return !(_.isNaN(d.slope))
+  })
+  var sorted_results = _.sortBy(filtered_results, function(d) {
+    return d.slope
+  })
+  var words = _.map(sorted_results, function(d) {
+    return '\n' + d.word
+  })
+  return string + _.take(words, 100)
+}
+function func7() {
+  var datafilter = _.filter(items, function(d) {
+    return d.word == 'internet'
+  })
+  var groups = _.groupBy(datafilter, 'decade')
+  console.log('groups', groups)
+  var rank =  _.mapValues(groups, function(d) {
+    return _.flatten(_.pluck(d, 'rank'))
+  })
+  var pairs = _.pairs(rank)
+  var decade = pairs[0][0] 
+  var words = _.groupBy(items, function(d) {
+    return d.word
+  })
+  var filtered_words = _.filter(words, function(d) {
+    return _.min(_.values(d), 'decade').decade == decade
+  })
+  var results = _.map(filtered_words, function(d) {
+    return d[0].word
+  })
+  return results.join(', ')
+}
+function func8() {
+  var filteredOilData = _.filter(items, function(d) {
+    return d.word == 'oil'
+  })
+  var filteredGoldData = _.filter(items, function(d) {
+    return d.word == 'gold'
+  })
+  oilDecades = _.map(filteredOilData, function(d) {
+    return _.pick(d, 'decade', 'rank')
+  })
+  goldDecades = _.map(filteredGoldData, function(d) {
+    return _.pick(d, 'decade', 'rank')
+  })
+  // Compare elements of both objects and find decade
+  var decade = _.map(_.zip(oilDecades, goldDecades), function(d) {
+    if (parseInt(d[0].rank) < parseInt(d[1].rank)) { return parseInt(d[0].decade) }
+  })
+  return _.min(decade) + 's'
+}
+function func9() {
+  var x
+  var y
+  var lr
+  var string = 'Greatest popularity drop over last century (basis greatest positive slope): ' 
+  var groups = _.groupBy(items, 'word')
+  var results = _.map(groups, function(key, value) {
+    y = _.map(key, function(d) {
+      return parseInt(d.rank)
+    })
+    x = _.map(key, function(d) {
+      return parseInt(d.decade)
+    })
+    lr = linearRegression(y, x)
+    return { word: value, slope: lr.slope }
+  })
+  var filtered_results = _.filter(results, function(d) {
+    return !(_.isNaN(d.slope))
+  })
+  var sorted_results = _.sortBy(filtered_results, function(d) {
+    return -d.slope
+  })
+  var words = _.map(sorted_results, function(d) {
+    return '\n' + d.word
+  })
+  return string + _.take(words, 100)
+}
+function func10() {
   return '...'
 }
-
-function func2(){
-  return '...'
-}
-
-function func3(){
-  return '...'
-}
-
-function func4(){
-  return '...'
-}
-
-function func5(){
-  return '...'
-}
-
-function func6(){
-  return '...'
-}
-
-function func7(){
-  return '...'
-}
-
-function func8(){
-  return '...'
-}
-
-function func9(){
-  return '...'
-}
-
-function func10(){
-  return '...'
-}
-
 // initialize the parallax effect
 $(document).ready(function(){
     $('.parallax').parallax()
 })
-
     </script>
 
 </body>
