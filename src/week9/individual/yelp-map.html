@@ -29,7 +29,7 @@
     <h3>Questions</h3>
 
     <section id="q1" class="question">
-        <h4>Where are all the McDonloads in Phoenix?</h4>
+        <h4>Where are all the McDonalds in Phoenix?</h4>
         <div class="answer"></div>
     </section>
 
@@ -82,7 +82,7 @@
     </section>
 
     <section id="q8" class="question">
-        <h4>What are the open/close statues of good restaurants in Phoenix?</h4>
+        <h4>What are the open/close states of good restaurants in Phoenix?</h4>
         <ul>
             <li>based on the previous map, mark open using green, close using red</li>
         </ul>
@@ -101,6 +101,7 @@
         <h4>Where are McDonald's and Burger Kings competing nearby?</h4>
         <ul>
             <li>nearby is defined as within 1000 meters</li>
+            <li>McDonalds (yellow), Burger King (blue)</li>
         </ul>
         <div class="answer"></div>
     </section>
@@ -112,7 +113,6 @@
     <script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
 
     <script>
-
 function example1(){
     var map = L.map($('#ex1 .answer')[0]).setView([33.45, -112.06], 8)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -121,11 +121,9 @@ function example1(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
     var latlng = [33.45, -112.06]
     L.marker(latlng).addTo(map)
 }
-
 function example2(){
     var map = L.map($('#ex2 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -134,18 +132,13 @@ function example2(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-
     var itemsInPhoenix = _.filter(items, {'city': 'Phoenix'})
     var first100Items = _.take(itemsInPhoenix, 100)
-
     _.forEach(first100Items, function(d){
         var latlng = [d['latitude'], d['longitude']]
         L.marker(latlng).addTo(map)
     })
 }
-
-
 function solution1(){
     var map = L.map($('#q1 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -154,10 +147,17 @@ function solution1(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO
+    // Map locations of required objects
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var mcdonaldsInPhoenix = _.filter(businessesInPhoenix, {'name': "McDonald's"})
+    var coordinates = _.map(mcdonaldsInPhoenix, function(d) {
+        return { 'latitude': d.latitude, 'longitude': d.longitude }
+    })
+    _.forEach(coordinates, function(d){
+        var latlng = [d['latitude'], d['longitude']]
+        L.marker(latlng).addTo(map)
+    })
 }
-
 function solution2(){
     var map = L.map($('#q2 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -166,10 +166,17 @@ function solution2(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO
+    // Map locations of required objects
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var starbucksInPhoenix = _.filter(businessesInPhoenix, {'name': "Starbucks"})
+    var coordinates = _.map(starbucksInPhoenix, function(d) {
+        return { 'latitude': d.latitude, 'longitude': d.longitude }
+    })
+    _.forEach(coordinates, function(d){
+        var latlng = [d['latitude'], d['longitude']]
+        L.marker(latlng).addTo(map)
+    })
 }
-
 function solution3(){
     var map = L.map($('#q3 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -178,15 +185,36 @@ function solution3(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO
+    // Map locations of required objects
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var starbucksInPhoenix = _.filter(businessesInPhoenix, {'name': "Starbucks"})
+    var starbuckscoordinates = _.map(starbucksInPhoenix, function(d) {
+        return { 'latitude': d.latitude, 'longitude': d.longitude }
+    })
+    var mcdonaldsInPhoenix = _.filter(businessesInPhoenix, {'name': "McDonald's"})
+    var mcdonaldscoordinates = _.map(mcdonaldsInPhoenix, function(d) {
+        return { 'latitude': d.latitude, 'longitude': d.longitude }
+    })
+    _.forEach(starbuckscoordinates, function(d){
+        var circle = L.circle([d.latitude, d.longitude], 500, {
+            color: 'green',
+            fillColor: '#f03',
+            fillOpacity: 0.5
+        }).addTo(map);
+    })
+    _.forEach(mcdonaldscoordinates, function(d){
+        var circle = L.circle([d.latitude, d.longitude], 500, {
+            color: 'blue',
+            fillColor: '#f03',
+            fillOpacity: 0.5
+        }).addTo(map);
+    })
     var circle = L.circle([33.45, -112.06], 500, {
         color: 'red',
         fillColor: '#f03',
         fillOpacity: 0.5
     }).addTo(map);
 }
-
 function solution4(){
     var map = L.map($('#q4 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -195,20 +223,22 @@ function solution4(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO
-    var circle = L.circle([33.45, -112.06], 500, {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5
-    }).addTo(map);
+    var businessesInPhoenix = _.take(_.filter(items, {'city': 'Phoenix'}), 200)
+    var ratings = _.map(businessesInPhoenix, function(d) {
+        var value = _.round((255 * d.stars)/(_.max(_.pluck(businessesInPhoenix, 'stars'))))
+        return { 'latitude': d.latitude, 'longitude': d.longitude, 'color': value }
+    })
+    _.forEach(ratings, function(d){
+        var circle = L.circle([d.latitude, d.longitude], 500, {
+            color: d.value,
+            fillColor: '#f03',
+            fillOpacity: 0.5
+        }).addTo(map);
+    })
 }
-
 function solution5(){
-
     // city center
     var cityCenterLatLng = [33.45, -112.06]
-
     var map = L.map($('#q5 .answer')[0]).setView(cityCenterLatLng, 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a       href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -216,26 +246,26 @@ function solution5(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO: modify the code below to develop your solution
-
-    var itemsInPhoenix = _.filter(items, {'city': 'Phoenix'})
-
-    // draw a line connecting the first two items
-    var latlng1 = [itemsInPhoenix[0].latitude, itemsInPhoenix[0].longitude]
-    var latlng2 = [itemsInPhoenix[1].latitude, itemsInPhoenix[1].longitude]
-    var latlngs = [latlng1, latlng2]
-    var polyline = L.polyline(latlngs, {color: 'yellow'}).addTo(map);
-
-    // draw a circle on the first item
-    L.circle(latlng1, 500, {color: 'red'}).addTo(map);
-    L.circle(latlng2, 500, {color: 'blue'}).addTo(map);
+    // Set center of Phoenix and get Starbucks in Phoenix
+    var centerOfPhoenix = [ 33.449184, -112.077019 ]
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var starbucks = _.filter(businessesInPhoenix, function(d) {
+        return d.name == 'Starbucks'
+    })
+    // Draw a blue circle for the center of Phoenix
+    L.circle(centerOfPhoenix, 500, {color: 'blue'}).addTo(map)
+    
+    // Draw a line connecting each Starbucks to the center of Phoenix
+    var vectors = _.map(starbucks, function(d) {
+        var latlng2 = [ d.latitude, d.longitude]
+        var latlngs = [centerOfPhoenix, latlng2]
+        var polyline = L.polyline(latlngs, {color: 'yellow'}).addTo(map);
+        L.circle(latlng2, 500, {color: 'red'}).addTo(map);
+    })
 }
-
 function solution6(){
     // city center
     var cityCenterLatLng = [33.45, -112.06]
-
     var map = L.map($('#q6 .answer')[0]).setView(cityCenterLatLng, 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a       href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -243,9 +273,24 @@ function solution6(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
+    // Set center of Phoenix and get Starbucks in Phoenix
+    var centerOfPhoenix = [ 33.449184, -112.077019 ]
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var starbucks = _.filter(businessesInPhoenix, function(d) {
+        return d.name == 'Starbucks'
+    })
+    // Draw a blue circle for the center of Phoenix
+    L.circle(centerOfPhoenix, 500, {color: 'blue'}).addTo(map)
+    
+    // Draw a line connecting each Starbucks to the center of Phoenix
+    var vectors = _.map(starbucks, function(d) {
+        var latlng2 = [ d.latitude, d.longitude]
+        var latlngs = [centerOfPhoenix, latlng2]
+        var polyline = L.polyline(latlngs, {color: 'yellow'}).addTo(map);
+        var value = 2 * (_.round((255 * d.review_count)/(_.max(_.pluck(starbucks, 'review_count')))))
+        L.circle(latlng2, value, {color: 'red'}).addTo(map);
+    })
 }
-
 function solution7(){
     var map = L.map($('#q7 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -254,10 +299,28 @@ function solution7(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var filter_reviews = _.filter(businessesInPhoenix, function(d) {
+        return d.review_count >= 5
+    })
+    var filter_stars = _.filter(filter_reviews, function(d) {
+        return d.stars >= 3.5
+    })
+    // Have filtered 'items' based on city, #reviews and rating (stars)
+    // Find all objects with a category element matching user input 'arg0'
+    var filter_categories = _.filter(filter_stars, function(f) {
+        return _.some(f.categories, function(d) {
+            return d == 'Restaurants'
+        })
+    })
+    _.forEach(filter_categories, function(d){
+        var circle = L.circle([d.latitude, d.longitude], 500, {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5
+        }).addTo(map);
+    })
 }
-
 function solution8(){
     var map = L.map($('#q8 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -266,10 +329,28 @@ function solution8(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var filter_reviews = _.filter(businessesInPhoenix, function(d) {
+        return d.review_count >= 5
+    })
+    var filter_stars = _.filter(filter_reviews, function(d) {
+        return d.stars >= 3.5
+    })
+    // Have filtered 'items' based on city, #reviews and rating (stars)
+    // Find all objects with a category element matching user input 'arg0'
+    var filter_categories = _.filter(filter_stars, function(f) {
+        return _.some(f.categories, function(d) {
+            return d == 'Restaurants'
+        })
+    })
+    _.forEach(filter_categories, function(d){
+        var circle = L.circle([d.latitude, d.longitude], 500, {
+            color: 'black',
+            fillColor: d.open?'green':'red',
+            fillOpacity: 0.5
+        }).addTo(map);
+    })
 }
-
 function solution9(){
     var map = L.map($('#q9 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -278,10 +359,18 @@ function solution9(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var upsStores = _.filter(businessesInPhoenix, function(d) {
+        return _.includes(d.name,'UPS')
+    })
+    var ranges = _.map(upsStores, function(d) {
+        var circle = L.circle([d.latitude, d.longitude], 5000, {
+            color: 'black',
+            fillColor: 'yellow',
+            fillOpacity: 0.5
+        }).addTo(map);
+    })
 }
-
 function solution10(){
     var map = L.map($('#q10 .answer')[0]).setView([33.45, -112.06], 11)
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -290,25 +379,35 @@ function solution10(){
         id: 'doubleshow.noeko77m',
         accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
     }).addTo(map)
-
-    // TODO
+    var businessesInPhoenix = _.filter(items, {'city': 'Phoenix'})
+    var mcdonalds = _.filter(businessesInPhoenix, {'name': "McDonald's"})
+    var burgerkings = _.filter(businessesInPhoenix, {'name': "Burger King"})
+    var ranges = _.map(mcdonalds, function(d) {
+        var circle = L.circle([d.latitude, d.longitude], 1000, {
+            color: 'black',
+            fillColor: 'yellow',
+            fillOpacity: 0.5
+        }).addTo(map);
+    })
+    var ranges = _.map(burgerkings, function(d) {
+        var circle = L.circle([d.latitude, d.longitude], 1000, {
+            color: 'black',
+            fillColor: 'blue',
+            fillOpacity: 0.5
+        }).addTo(map);
+    })
 }
-
 var items = []
 function loadDataThenRunSolutions(){
     $.get({url: 'http://bigdatahci2015.github.io/data/yelp/yelp_academic_dataset_business.5000.json.lines.txt'})
      .done(function(data){
          var lines = data.trim().split('\n')
-
          // convert text lines to json arrays and save them in `items`
          items = _.map(lines, JSON.parse)
-
          console.log('number of items loaded:', items.length)
          console.log('first item', items[0])
-
          example1()
          example2()
-
          solution1()
          solution2()
          solution3()
@@ -324,9 +423,7 @@ function loadDataThenRunSolutions(){
          console.error(err)
      })
 }
-
 loadDataThenRunSolutions()
-
     </script>
 </body>
 </html>
